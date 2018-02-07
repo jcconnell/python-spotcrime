@@ -6,9 +6,10 @@ import math
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 import requests
 
-
-DASHBOARD_URL = 'https://www.crimereports.com/home/#!/dashboard'
-CRIME_URL = 'https://www.crimereports.com/api/crimes/details.json'
+CRIME_URL = 'http://api.spotcrime.com/crimes.json'
+API_KEY = 'privatekeyforspotcrimepublicusers-commercialuse-877.410.1607'
+DASHBOARD_URL = 'https://spotcrime.com/'
+USER_AGENT = 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
 ATTRIBUTION = 'Information provided by spotcrime.com'
 SEPARATOR = ','
 WHITESPACE = ' '
@@ -18,51 +19,19 @@ HTTP_GET = 'GET'
 DAYS = [day.lower() for day in calendar.day_name]  # type: ignore
 EARTH_RADIUS = 6378.1
 MILES_PER_KILOMETER = 0.621371
-UPPER_RIGHT_DEGREE = 45
-LOWER_LEFT_DEGREE = 225
-INCIDENT_TYPES = ['Alarm', 'Arson', 'Assault', 'Assault with Deadly Weapon',
-                  'Breaking & Entering', 'Community Policing', 'Death',
-                  'Disorder', 'Drugs', 'Emergency', 'Family Offense', 'Fire',
-                  'Homicide', 'Kidnapping', 'Liquor', 'Missing Person', 'Other',
-                  'Other Sexual Offense', 'Pedestrian Stop', 'Proactive Policing',
-                  'Property Crime', 'Property Crime Commercial',
-                  'Property Crime Residential', 'Quality of Life', 'Robbery',
-                  'Sexual Assault', 'Sexual Offense', 'Theft', 'Theft from Vehicle',
-                  'Theft of Vehicle', 'Traffic', 'Vehicle Recovery', 'Vehicle Stop',
-                  'Weapons Offense']
+INCIDENT_TYPES = ['Arrest', 'Arson', 'Assault', 'Burglary', 'Robbery', 'Shooting',
+        'Theft', 'Vandalism', 'Other']
 
-
-def _destination(start: Tuple[float, float], distance: float,
-                 bearing: float, miles: bool=True) -> Tuple[float, float]:
-    """Get destination point given a vector (start, distance, bearing)."""
-    if miles:
-        distance /= MILES_PER_KILOMETER
-    lat1 = math.radians(start[0])
-    lon1 = math.radians(start[1])
-    percent = distance / EARTH_RADIUS
-    bearing = math.radians(bearing)
-    lat2 = math.asin(math.sin(lat1) * math.cos(percent) +
-                     math.cos(lat1) * math.sin(percent) * math.cos(bearing))
-    lon2 = lon1 + math.atan2(math.sin(bearing) * math.sin(percent) * math.cos(lat1),
-                             math.cos(percent) - math.sin(lat1) * math.sin(lat2))
-    return (math.degrees(lat2), math.degrees(lon2))
-
-
-def _incident_transform(incident: Dict[str, Any]) -> Dict[str, Any]:
+def _incident_transform(incident):
     """Get output dict from incident."""
-    coordinates = None
-    if 'location' in incident and 'coordinates' in incident.get('location'):
-        coordinates = tuple(incident.get('location').get('coordinates', [])[::-1])
     return {
-        'id': incident.get('incident_id'),
-        'type': incident.get('parent_incident_type'),
-        'description': incident.get('incident_description'),
-        'friendly_description': _friendly_description(incident.get('incident_description')),
-        'timestamp': incident.get('incident_datetime'),
-        'coordinates': coordinates,
-        'location': '{} {} {}'.format(incident.get('address_1').capitalize(),
-                                      incident.get('city').capitalize(),
-                                      incident.get('state'))
+        'id': incident.get('cdid'),
+        'type': incident.get('type'),
+        'timestamp': incident.get('date'),
+        'lat': incident.get('lat'),
+        'lon': incident.get('lon'),
+        'location': incident.get('address'),
+        'link': incident.get('link')
     }
 
 
@@ -73,74 +42,37 @@ def _validate_incident_types(incident_types: Sequence[str]) -> None:
             raise ValueError('invalid incident type: {}'.format(incident_type))
 
 
-def _friendly_description(description):
-    """Clean up descriptions."""
-    clean = []
-    for token in description.split():
-        if not token.replace(',', '').isdigit():
-            clean.append(token.strip())
-    return WHITESPACE.join(clean).capitalize()
-
-
 class SpotCrime():
     """Crime Reports API wrapper."""
 
-    def __init__(self, point: Tuple[float, float], radius: float, miles: bool=False) -> None:
-        """Initialize.
+    def __init__(self, point, rad):
+        self.point = point #tuple
+        self.rad = rad #float
+        self.headers = {
+            'User-Agent': USER_AGENT
+        }
+        pass
 
-        Note that radius implies circular viewport,
-        but the Crime Reports API requires a square.
-        Therefore, the coordinates sent are the extents
-        of a square fit around the circle defined by the
-        point and the radius.
-        """
-        #squared_radius = math.sqrt(2 * math.pow(radius, 2))
-        #self._upper_right = _destination(point, squared_radius, UPPER_RIGHT_DEGREE, miles=miles)
-        #self._lower_left = _destination(point, squared_radius, LOWER_LEFT_DEGREE, miles=miles)
-
-    def _get_params(self, date: datetime.date, include: Optional[Sequence],
-                    exclude: Optional[Sequence]) -> Dict[str, Union[str, int, float]]:
-        """HTTP GET request params."""
-        incident_types = set(INCIDENT_TYPES)
-        if include:
-            _validate_incident_types(include)
-            incident_types = set(include)
-        if exclude:
-            _validate_incident_types(exclude)
-            incident_types -= set(exclude)
+    def _get_params(self):
         return {
-            'days': SEPARATOR.join(DAYS),
-            'end_date': str(date),
-            'end_time': 23,
-            'incident_types': SEPARATOR.join(incident_types),
-            'include_sex_offenders': 'false',
-            'filter_by_viewport': 'true',
-            'lat1': point[0], #self._upper_right[0],
-            'lng1': point[1], #self._upper_right[1],
-            #'lat2': self._lower_left[0],
-            #'lng2': self._lower_left[1],
-            'sandbox': 'false',
-            'start_date': str(date),
-            'start_time': 0
+            'key': API_KEY,
+            'lat': self.point[0],
+            'lon': self.point[1],
+            'radius': self.rad
         }
 
-    def get_map_url(self, date: datetime.date, include: Sequence[str]=None,
-                    exclude: Sequence[str]=None) -> str:
+    def get_map_url(self):
         """Get map URL for this instantiation."""
-        return requests.Request(HTTP_GET, DASHBOARD_URL,
-                                params=self._get_params(lat, lng)).prepare().url
-        #return requests.Request(HTTP_GET, DASHBOARD_URL,
-                                #params=self._get_params(date, include, exclude)).prepare().url
+        return requests.Request(HTTP_GET, CRIME_URL).prepare().url
 
     def get_incidents(self, date: datetime.date, include: Sequence[str]=None,
                       exclude: Sequence[str]=None) -> List[Dict[str, str]]:
         """Get incidents."""
-        resp = requests.get(CRIME_URL, params=self._get_params(date, include, exclude))
+        resp = requests.get(CRIME_URL, params=self._get_params(), headers=self.headers)
         incidents = []  # type: List[Dict[str, str]]
         data = resp.json()
-        if ATTR_AGENCIES not in data:
-            return incidents
-        for agency in data.get(ATTR_AGENCIES):
-            for incident in agency.get(ATTR_CRIMES):
-                incidents.append(_incident_transform(incident))
+        #if ATTR_CRIMES not in data:
+        #    return incidents
+        for incident in data.get(ATTR_CRIMES):
+            incidents.append(_incident_transform(incident))
         return incidents
