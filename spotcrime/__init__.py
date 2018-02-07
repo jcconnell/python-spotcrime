@@ -67,8 +67,8 @@ class SpotCrime():
         resp = requests.get(CRIME_URL, params=self._get_params(), headers=self.headers)
         incidents = []  # type: List[Dict[str, str]]
         data = resp.json()
-        #if ATTR_CRIMES not in data:
-        #    return incidents
+        if ATTR_CRIMES not in data:
+            return incidents
         for incident in data.get(ATTR_CRIMES):
             incidents.append(_incident_transform(incident))
         return incidents

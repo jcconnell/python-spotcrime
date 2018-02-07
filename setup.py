@@ -6,7 +6,7 @@ setup(
     name='spotcrime',
     version='1.0.0',
     description='Provides basic API to spotcrime.com.',
-    url='https://github.com/happyleavesaoc/python-crimereports/',
+    url='https://github.com/jcconnell/python-spotcrime',
     license='MIT',
     author='jcconnell',
     author_email='jamescarltonconnell@gmail.com',
