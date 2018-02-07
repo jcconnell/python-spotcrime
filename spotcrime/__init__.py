@@ -63,7 +63,7 @@ class SpotCrime():
 
     def get_map_url(self):
         """Get map URL for this instantiation."""
-        return requests.Request(HTTP_GET, CRIME_URL).prepare().url
+        return requests.Request(HTTP_GET, DASHBOARD_URL).prepare().url
 
     def get_incidents(self, date: datetime.date, include: Sequence[str]=None,
                       exclude: Sequence[str]=None) -> List[Dict[str, str]]:
