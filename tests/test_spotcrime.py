@@ -14,50 +14,31 @@ class TestSpotCrime(unittest.TestCase):
         incident = {
             'incident_id': 1,
             'parent_incident_type': 'type',
-            'address_1': 'ADDRESS',
-            'city': 'CITY',
-            'state': 'STATE',
-            'incident_description': '10 4, DESC',
-            'incident_datetime': '2017-02-02T12:33:00.000',
-            'location': {
-                'coordinates': [-73.995808, 40.711806]
-            }
+            'timestamp': '2017-02-02T12:33:00.000',
+            'parent_incident_lat': '-73.995808',
+            'parent_incident_lon': '40.711806',
+            'location': 'ADDRESS',
+            'incident_link': 'https://spotcrime.com/',
         }
-        self.assertEqual(crimereports._incident_transform(incident), {
+        self.assertEqual(spotcrime._incident_transform(incident), {
             'id': 1,
             'type': 'type',
-            'location': 'Address City STATE',
-            'description': '10 4, DESC',
-            'friendly_description': 'Desc',
             'timestamp': '2017-02-02T12:33:00.000',
-            'coordinates': (40.711806, -73.995808)
+            'lat': '-73.995808',
+            'lon': '40.711806',
+            'location': 'ADDRESS',
+            'link': 'https://spotcrime.com/',
         })
 
     def test_validate_incident_types(self):
         with self.assertRaises(ValueError):
             crimereports._validate_incident_types(['Alarm', 'Bad Type'])
 
-    def test_friendly_description(self):
-        self.assertEqual(crimereports._friendly_description('10 4, TEST'), 'Test')
-        self.assertEqual(crimereports._friendly_description('4 TesT'), 'Test')
-        self.assertEqual(crimereports._friendly_description('10 4, TEST, B&E'), 'Test, b&e')
-
     def test_get_map_url(self):
-        cr = crimereports.CrimeReports(NEWARK, 1, miles=True)
-        self.assertTrue(cr.get_map_url(TODAY).startswith('https://www.crimereports.com'))
-
-    def test_include(self):
-        cr = crimereports.CrimeReports(NEWARK, 1, miles=True)
-        url = cr.get_map_url(TODAY, include=['Alarm'])
-        self.assertTrue('Alarm' in url)
-        self.assertFalse('Assault' in url)
-
-    def test_exclude(self):
-        cr = crimereports.CrimeReports(NEWARK, 1, miles=True)
-        url = cr.get_map_url(TODAY, exclude=['Alarm'])
-        self.assertFalse('Alarm' in url)
+        sc = spotcrime.SpotCrime(NEWARK, 0.01)
+        self.assertTrue(sc.get_map_url().startswith('https://www.spotcrime.com'))
 
     def test_get_incidents(self):
-        cr = crimereports.CrimeReports(NEWARK, 0.1, miles=True)
-        incidents = cr.get_incidents(TODAY)
+        sc = spotcrime.SpotCrime(NEWARK, 0.01)
+        incidents = sc.get_incidents()
         self.assertIsInstance(incidents, list)
