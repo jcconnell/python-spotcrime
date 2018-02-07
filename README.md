@@ -1,7 +1,7 @@
-python-spotcrime [![Build Status](https://travis-ci.org/happyleavesaoc/python-crimereports.svg?branch=master)](https://travis-ci.org/happyleavesaoc/python-crimereports)
+python-spotcrime [![Build Status](https://travis-ci.org/jcconnell/python-spotcrime.svg?branch=master)](https://travis-ci.org/jcconnell/python-spotcrime)
 ==============================================================================================================================================================================================
 
-Provides basic API to [Spot Crime](https://github.com/contra/spotcrime).
+Provides basic API to [Spot Crime](https://spotcrime.com/).
 
 ## Install
 
@@ -13,18 +13,23 @@ Provides basic API to [Spot Crime](https://github.com/contra/spotcrime).
 import datetime
 from spotcrime import SpotCrime
 
-sc = SpotCrime((lat, lng), radius, miles=True)
-for incident in sc.get_incidents(datetime.datetime.now().date(), None, ['Community Policing']):
+sc = SpotCrime((lat, lng), radius)
+for incident in sc.get_incidents():
   print(incident)
 ```
 
 ## Development
 
-Pull requests welcome. Must pass `tox` and include tests.
+Pull requests welcome.
 
 ## Disclaimer
 
 Not affiliated with spotcrime.com. Use at your own risk.
+
+## TODO:
+- Smarter radius conversion (1 mile = 0.01)
+- Support included/excluded types
+- Support date ranges
 
 ## NOTES:
 
