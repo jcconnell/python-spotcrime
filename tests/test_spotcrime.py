@@ -1,6 +1,6 @@
 import datetime
 import unittest
-import crimereports
+import spotcrime
 
 
 TODAY = datetime.datetime.now().date()
@@ -8,20 +8,7 @@ NYC = (40.711806, -73.995808)
 NEWARK = (40.734985, -74.172447)
 
 
-class TestDestination(unittest.TestCase):
-
-    def test_destination_miles(self):
-        dest = crimereports._destination(NYC, 10, 90, miles=True)
-        self.assertAlmostEqual(dest[0], 40.711, delta=0.001)
-        self.assertAlmostEqual(dest[1], -73.805, delta=0.001)
-
-    def test_destination_kilometers(self):
-        dest = crimereports._destination(NYC, 10, 90, miles=False)
-        self.assertAlmostEqual(dest[0], 40.711, delta=0.001)
-        self.assertAlmostEqual(dest[1], -73.877, delta=0.001)
-
-
-class TestCrimeReports(unittest.TestCase):
+class TestSpotCrime(unittest.TestCase):
 
     def test_incident_transform(self):
         incident = {

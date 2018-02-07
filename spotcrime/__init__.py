@@ -1,4 +1,4 @@
-"""Crime Reports API."""
+"""Spot Crime API."""
 
 import calendar
 import datetime
@@ -7,18 +7,14 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 import requests
 
 CRIME_URL = 'http://api.spotcrime.com/crimes.json'
-API_KEY = 'privatekeyforspotcrimepublicusers-commercialuse-877.410.1607'
 DASHBOARD_URL = 'https://spotcrime.com/'
+API_KEY = 'privatekeyforspotcrimepublicusers-commercialuse-877.410.1607'
 USER_AGENT = 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
 ATTRIBUTION = 'Information provided by spotcrime.com'
 SEPARATOR = ','
 WHITESPACE = ' '
-ATTR_AGENCIES = 'agencies'
 ATTR_CRIMES = 'crimes'
 HTTP_GET = 'GET'
-DAYS = [day.lower() for day in calendar.day_name]  # type: ignore
-EARTH_RADIUS = 6378.1
-MILES_PER_KILOMETER = 0.621371
 INCIDENT_TYPES = ['Arrest', 'Arson', 'Assault', 'Burglary', 'Robbery', 'Shooting',
         'Theft', 'Vandalism', 'Other']
 
