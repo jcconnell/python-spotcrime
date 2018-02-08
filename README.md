@@ -10,7 +10,6 @@ Provides basic API to [Spot Crime](https://spotcrime.com/).
 ## Usage
 
 ```python
-import datetime
 from spotcrime import SpotCrime
 
 sc = SpotCrime((lat, lng), radius)
