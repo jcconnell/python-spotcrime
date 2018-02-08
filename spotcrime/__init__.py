@@ -1,8 +1,5 @@
 """Spot Crime API."""
 
-import calendar
-import datetime
-import math
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 import requests
 
@@ -39,7 +36,7 @@ def _validate_incident_types(incident_types: Sequence[str]) -> None:
 
 
 class SpotCrime():
-    """Crime Reports API wrapper."""
+    """Spot Crime API wrapper."""
 
     def __init__(self, point, rad):
         self.point = point #tuple
@@ -61,8 +58,7 @@ class SpotCrime():
         """Get map URL for this instantiation."""
         return requests.Request(HTTP_GET, DASHBOARD_URL).prepare().url
 
-    def get_incidents(self, date: datetime.date, include: Sequence[str]=None,
-                      exclude: Sequence[str]=None) -> List[Dict[str, str]]:
+    def get_incidents(self):
         """Get incidents."""
         resp = requests.get(CRIME_URL, params=self._get_params(), headers=self.headers)
         incidents = []  # type: List[Dict[str, str]]

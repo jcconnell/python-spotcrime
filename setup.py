@@ -4,7 +4,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='spotcrime',
-    version='1.0.0',
+    version='1.0.1',
     description='Provides basic API to spotcrime.com.',
     url='https://github.com/jcconnell/python-spotcrime',
     license='MIT',
