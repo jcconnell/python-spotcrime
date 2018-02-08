@@ -27,14 +27,6 @@ def _incident_transform(incident):
         'link': incident.get('link')
     }
 
-
-def _validate_incident_types(incident_types: Sequence[str]) -> None:
-    """Validate an incident types."""
-    for incident_type in incident_types:
-        if incident_type not in INCIDENT_TYPES:
-            raise ValueError('invalid incident type: {}'.format(incident_type))
-
-
 class SpotCrime():
     """Spot Crime API wrapper."""
 
