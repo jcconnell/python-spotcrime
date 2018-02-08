@@ -34,7 +34,6 @@ class SpotCrime():
         self.headers = {
             'User-Agent': USER_AGENT
         }
-        pass
 
     def _get_params(self):
         return {
