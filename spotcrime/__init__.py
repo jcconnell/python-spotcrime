@@ -2,6 +2,8 @@
 
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 import requests
+import datetime
+
 
 CRIME_URL = 'http://api.spotcrime.com/crimes.json'
 DASHBOARD_URL = 'https://spotcrime.com/'
@@ -12,6 +14,19 @@ ATTR_CRIMES = 'crimes'
 HTTP_GET = 'GET'
 INCIDENT_TYPES = ['Arrest', 'Arson', 'Assault', 'Burglary', 'Robbery', 'Shooting',
         'Theft', 'Vandalism', 'Other']
+
+
+def _validate_incident_date_range(incident, numdays):
+    """Returns true if incident is within date range"""
+    try:
+        datetime_object = datetime.datetime.strptime(incident.get('date'), '%m/%d/%y %I:%M %p')
+    except ValueError:
+        raise ValueError("Incorrect date format, should be MM/DD/YY HH:MM AM/PM")
+    timedelta = datetime.timedelta(days=numdays)
+    today = datetime.datetime.now()
+    if today - datetime_object <= timedelta:
+        return True
+    return False
 
 def _incident_transform(incident):
     """Get output dict from incident."""
@@ -28,9 +43,10 @@ def _incident_transform(incident):
 class SpotCrime():
     """Spot Crime API wrapper."""
 
-    def __init__(self, point, rad):
+    def __init__(self, point, rad, days=1):
         self.point = point #tuple
         self.rad = rad #float
+        self.days = days #int
         self.headers = {
             'User-Agent': USER_AGENT
         }
@@ -55,5 +71,6 @@ class SpotCrime():
         if ATTR_CRIMES not in data:
             return incidents
         for incident in data.get(ATTR_CRIMES):
-            incidents.append(_incident_transform(incident))
+            if _validate_incident_date_range(incident, self.days):
+                incidents.append(_incident_transform(incident))
         return incidents
