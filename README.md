@@ -27,8 +27,8 @@ Not affiliated with spotcrime.com. Use at your own risk.
 
 ## TODO:
 - Smarter radius conversion (1 mile = 0.01)
-- Support included/excluded types
-- Support date ranges
+- ~~Support included/excluded types~~
+- ~~Support date ranges~~
 
 ## NOTES:
 
