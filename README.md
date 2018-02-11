@@ -12,7 +12,7 @@ Provides basic API to [Spot Crime](https://spotcrime.com/).
 ```python
 from spotcrime import SpotCrime
 
-sc = SpotCrime((lat, lng), radius)
+sc = SpotCrime((lat, lng), radius, None, ['Other'], days=10)
 for incident in sc.get_incidents():
   print(incident)
 ```
