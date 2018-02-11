@@ -28,6 +28,7 @@ def _validate_incident_date_range(incident, numdays):
         return True
     return False
 
+
 def _incident_transform(incident):
     """Get output dict from incident."""
     return {
@@ -40,16 +41,38 @@ def _incident_transform(incident):
         'link': incident.get('link')
     }
 
+
+def _validate_incident_types(incident_types):
+    """Validate incident types"""
+    for incident_type in incident_types:
+        if incident_type not in INCIDENT_TYPES:
+            raise ValueError('Invalid incident type: {}'.format(incident_type))
+
+
+def _incident_in_types(incident, incident_types):
+    """Validate incident type is attribute of incident types"""
+    if incident.get('type') in incident_types:
+        return True
+    return False
+
+
 class SpotCrime():
     """Spot Crime API wrapper."""
 
-    def __init__(self, point, rad, days=1):
+    def __init__(self, point, rad, include, exclude, days=1):
         self.point = point #tuple
         self.rad = rad #float
         self.days = days #int
         self.headers = {
             'User-Agent': USER_AGENT
         }
+        self.incident_types = set(INCIDENT_TYPES)
+        if include:
+            _validate_incident_types(include)
+            self.incident_types = set(include)
+        if exclude:
+            _validate_incident_types(exclude)
+            self.incident_types -= set(exclude)
 
     def _get_params(self):
         return {
@@ -72,5 +95,6 @@ class SpotCrime():
             return incidents
         for incident in data.get(ATTR_CRIMES):
             if _validate_incident_date_range(incident, self.days):
-                incidents.append(_incident_transform(incident))
+                if _incident_in_types(incident, self.incident_types):
+                    incidents.append(_incident_transform(incident))
         return incidents
