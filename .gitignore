@@ -1,1 +1,6 @@
-spotcrime/__pycache__/
+dist/
+*.egg-info/
+.tox/
+*.pickle
+*.pyc
+.coverage
