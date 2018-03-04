@@ -12,7 +12,7 @@ Provides basic API to [Spot Crime](https://spotcrime.com/).
 ```python
 from spotcrime import SpotCrime
 
-sc = SpotCrime((lat, lng), radius, None, ['Other'], days=10)
+sc = SpotCrime((lat, lng), radius, None, ['Other'], "your-api-key", days=10)
 for incident in sc.get_incidents():
   print(incident)
 ```
@@ -32,6 +32,4 @@ Not affiliated with spotcrime.com. Use at your own risk.
 
 ## NOTES:
 
-These links may be useful in the future:
-- http://www.vcso.us/activecalls/
-- http://www.volusiasheriff.org/reports/district6-logs.stml
+To obtain an API key for commercial or research use, please contact 877.410.1607 or pyrrhus-at-spotcrime.com. The maximum number of returned results is 50, regardless of date.
