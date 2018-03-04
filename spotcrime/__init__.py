@@ -7,7 +7,6 @@ import datetime
 
 CRIME_URL = 'http://api.spotcrime.com/crimes.json'
 DASHBOARD_URL = 'https://spotcrime.com/'
-API_KEY = 'privatekeyforspotcrimepublicusers-commercialuse-877.410.1607'
 USER_AGENT = 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
 ATTRIBUTION = 'Information provided by spotcrime.com'
 ATTR_CRIMES = 'crimes'
@@ -59,7 +58,8 @@ def _incident_in_types(incident, incident_types):
 class SpotCrime():
     """Spot Crime API wrapper."""
 
-    def __init__(self, point, rad, include, exclude, days=1):
+    def __init__(self, point, rad, include, exclude, api_key, days=1):
+        self.api_key = api_key
         self.point = point #tuple
         self.rad = rad #float
         self.days = days #int
@@ -76,7 +76,7 @@ class SpotCrime():
 
     def _get_params(self):
         return {
-            'key': API_KEY,
+            'key': self.api_key,
             'lat': self.point[0],
             'lon': self.point[1],
             'radius': self.rad
